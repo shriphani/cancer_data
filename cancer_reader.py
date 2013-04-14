@@ -5,7 +5,7 @@ import cleaner
 
 
 class Post(object):
-	def __init__(self, post_id, post_time_str, forum_id, thread_id, author_id, author_name, first_post_marker, title, content):
+	def __init__(self, post_id, post_time_str, forum_id, thread_id, author_id, author_name, first_post_marker, title, content, clean = True):
 		self.post_id = int(post_id)
 		self.post_time_str = post_time_str
 		self.forum_id = int(forum_id)
@@ -14,10 +14,17 @@ class Post(object):
 		self.author_name = author_name
 		self.is_first_post = int(first_post_marker)
 		self.title = title 
-		self.content = cleaner.clean_text(content)
+		self.clean = clean
+		if clean:
+			self.content = cleaner.clean_text(content)
+		else:
+			self.content = content
 
 	def add_content(self, text):
-		self.content += ' ' + cleaner.clean_text(text)
+		if self.clean:
+			self.content += ' ' + cleaner.clean_text(text)
+		else:
+			self.content += text
 
 class Thread(object):
 	def __init__(self, thread_id, posts):
@@ -27,7 +34,7 @@ class Thread(object):
 class CancerReader(object):
 
 	@staticmethod
-	def parse(posts_file):
+	def parse(posts_file, clean = True):
 		global GLOBAL_WORDS_FILE
 		global GLOBAL_WORDS_FILE_HANDLE
 
@@ -39,6 +46,7 @@ class CancerReader(object):
 			for new_line in f:
 				# try to see if this is a new post.
 				split_attempt = new_line.split('|')
+				split_attempt.append(clean)
 				possibly_new_post = CancerReader.new_post_started(split_attempt)
 
 				if possibly_new_post and not current_thread:
@@ -67,13 +75,16 @@ class CancerReader(object):
 def _parse_cmd_line_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('posts_file', metavar='posts-file', help='Location of posts file')
+	parser.add_argument('--no-clean', dest = 'clean', action = 'store_false', default = True)
 	return parser.parse_args()
 
 
 if __name__ == '__main__':
-	posts_file = _parse_cmd_line_args().posts_file
+	parsed = _parse_cmd_line_args()
+	posts_file = parsed.posts_file
+	clean = parsed.clean
 
-	for thread in CancerReader.parse(posts_file):
+	for thread in CancerReader.parse(posts_file, clean = clean):
 		for post in thread.posts:
 			print '%(post_id)d|%(post_time_str)s|%(forum_id)d|%(thread_id)d|%(author_id)d|%(author_name)s|%(first_post_marker)d|%(title)s|%(content)s' %\
 					{

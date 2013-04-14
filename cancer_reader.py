@@ -3,8 +3,6 @@
 import argparse
 import cleaner
 
-GLOBAL_WORDS_FILE = 'words_list.txt'
-GLOBAL_WORDS_FILE_HANDLE = open(GLOBAL_WORDS_FILE, 'w')
 
 class Post(object):
 	def __init__(self, post_id, post_time_str, forum_id, thread_id, author_id, author_name, first_post_marker, title, content):
@@ -89,8 +87,3 @@ if __name__ == '__main__':
 						'title': post.title,
 						'content': post.content
 					}
-
-			for word in post.content.split():
-				GLOBAL_WORDS_FILE_HANDLE.write(word + '\n')
-
-	GLOBAL_WORDS_FILE_HANDLE.close()

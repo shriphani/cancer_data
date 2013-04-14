@@ -27,6 +27,8 @@ class Thread(object):
 		self.posts = posts
 
 class CancerReader(object):
+
+	@staticmethod
 	def parse(posts_file):
 		global GLOBAL_WORDS_FILE
 		global GLOBAL_WORDS_FILE_HANDLE
@@ -57,6 +59,7 @@ class CancerReader(object):
 				else:
 					current_post.add_content(new_line)
 
+	@staticmethod
 	def new_post_started(split_attempt):
 		try:
 			return apply(Post, split_attempt)

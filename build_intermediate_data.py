@@ -132,6 +132,21 @@ if __name__ == '__main__':
 			help = 'Generate and send to stdout user_id, post-count'
 		)
 
+		parser.add_argument(
+			'--generate-usernames-json',
+			dest = 'generate_usernames_json',
+			action = 'store_true',
+			default = False,
+			help = 'Generate a json file with username mapped to post count'
+		)
+		parser.add_argument(
+			'--generate-usernames',
+			dest = 'generate_usernames',
+			action = 'store_true',
+			default = False,
+			help = 'Generate and send to stdout username, post count'
+		)
+
 		return parser.parse_args()
 
 	parsed = parse_cmdline_args()
@@ -148,4 +163,8 @@ if __name__ == '__main__':
 	if parsed.generate_user_id:
 		generate_user_id_list_freqs_output(parsed.posts_file)
 
-	
+	if parsed.generate_usernames_json:
+		generate_user_id_list_freqs_json(parsed.posts_file, parsed.output_file)
+
+	if parsed.generate_usernames:
+		generate_user_list_freqs_output(parsed.posts_file)

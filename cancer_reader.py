@@ -5,7 +5,7 @@ import cleaner
 
 
 class Post(object):
-	def __init__(self, post_id, post_time_str, forum_id, thread_id, author_id, author_name, first_post_marker, title, content, clean = True):
+	def __init__(self, post_id, post_time_str, forum_id, thread_id, author_id, author_name, first_post_marker, title, content, clean = True, stem = False):
 		self.post_id = int(post_id)
 		self.post_time_str = post_time_str
 		self.forum_id = int(forum_id)
@@ -15,13 +15,18 @@ class Post(object):
 		self.is_first_post = int(first_post_marker)
 		self.title = title 
 		self.clean = clean
-		if clean:
+		self.stem = stem
+		if stem:
+			self.content = cleaner.clean_text_and_stem(content)
+		elif clean:
 			self.content = cleaner.clean_text(content)
 		else:
 			self.content = content
 
 	def add_content(self, text):
-		if self.clean:
+		if self.stem:
+			self.content += ' ' + cleaner.clean_text_and_stem(text)
+		elif self.clean:
 			self.content += ' ' + cleaner.clean_text(text)
 		else:
 			self.content += text
@@ -34,7 +39,7 @@ class Thread(object):
 class CancerReader(object):
 
 	@staticmethod
-	def parse(posts_file, clean = True):
+	def parse(posts_file, clean = True, stem = False):
 		global GLOBAL_WORDS_FILE
 		global GLOBAL_WORDS_FILE_HANDLE
 
@@ -47,6 +52,7 @@ class CancerReader(object):
 				# try to see if this is a new post.
 				split_attempt = new_line.split('|')
 				split_attempt.append(clean)
+				split_attempt.append(stem)
 				possibly_new_post = CancerReader.new_post_started(split_attempt)
 
 				if possibly_new_post and not current_thread:

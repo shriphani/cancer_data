@@ -23,7 +23,7 @@ def generate_types_freqs_json(posts_file, output_file = 'words_freqs.json'):
 def generate_types_freqs(posts_file):
 	result = {}
 
-	for thread in CancerReader.parse(posts_file):
+	for thread in CancerReader.parse(posts_file, clean = True, stem = True):
 		for post in thread.posts:
 			for term in post.content.split():
 				if term in result:
@@ -39,6 +39,53 @@ def generate_types_freqs_output(posts_file):
 	for word, freq in sorted(result.iteritems(), key=operator.itemgetter(1), reverse = True):
 		print word, freq
 
+def generate_user_id_list_freqs(posts_file):
+	users_freqs = {}
+
+	for thread in CancerReader.parse(posts_file, clean = False, stem = False):
+		for post in thread.posts:
+			if post.author_id in users_freqs:
+				users_freqs[post.author_id] += 1
+			else:
+				users_freqs[post.author_id] = 1
+
+	return users_freqs
+
+def generate_user_id_list_freqs_json(posts_file, output_file):
+	users_freqs = generate_user_id_list_freqs(posts_file)
+
+	with open(output_file, 'w+') as output_file_handle:
+		json.dump(users_freqs, output_file_handle)
+
+def generate_user_id_list_freqs_output(posts_file):
+	users_freqs = generate_user_id_list_freqs(posts_file)
+
+	for user, freq in sorted(users_freqs.iteritems(), key = operator.itemgetter(1), reverse = True):
+		print user, freq
+
+def generate_user_list_freqs(posts_file):
+	users_freqs = {}
+
+	for thread in CancerReader.parse(posts_file, clean = False, stem = False):
+		for post in thread.posts:
+			if post.author_id in users_freqs:
+				users_freqs[post.author_id] += 1
+			else:
+				users_freqs[post.author_id] = 1
+
+	return users_freqs
+
+def generate_user_list_freqs_json(posts_file, output_file):
+	users_freqs = generate_user_list_freqs(posts_file)
+
+	with open(output_file, 'w+') as output_file_handle:
+		json.dump(users_freqs, output_file_handle)
+
+def generate_user_list_freqs_output(posts_file):
+	users_freqs = generate_user_list_freqs(posts_file)
+
+	for user, freq in sorted(users_freqs.iteritems(), key = operator.itemgetter(1), reverse = True):
+		print user, freq
 
 if __name__ == '__main__':
 	def parse_cmdline_args():
@@ -70,6 +117,21 @@ if __name__ == '__main__':
 			help = 'Generate and send to stdout word, word_freq'
 		)
 
+		parser.add_argument(
+			'--generate-user-id-json',
+			dest = 'generate_user_id_json',
+			action = 'store_true',
+			default = False,
+			help = 'Generate a json file with user_id mapped to post count'
+		)
+		parser.add_argument(
+			'--generate-user-id',
+			dest = 'generate_user_id',
+			action = 'store_true',
+			default = False,
+			help = 'Generate and send to stdout user_id, post-count'
+		)
+
 		return parser.parse_args()
 
 	parsed = parse_cmdline_args()
@@ -80,3 +142,10 @@ if __name__ == '__main__':
 	if parsed.generate_types:
 		generate_types_freqs_output(parsed.posts_file)
 
+	if parsed.generate_user_id_json:
+		generate_user_id_list_freqs_json(parsed.posts_file, parsed.output_json_file)
+
+	if parsed.generate_user_id:
+		generate_user_id_list_freqs_output(parsed.posts_file)
+
+	

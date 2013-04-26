@@ -87,6 +87,7 @@ def generate_user_list_freqs_output(posts_file):
 	for user, freq in sorted(users_freqs.iteritems(), key = operator.itemgetter(1), reverse = True):
 		print user, freq
 
+
 if __name__ == '__main__':
 	def parse_cmdline_args():
 		parser = argparse.ArgumentParser()
@@ -164,7 +165,7 @@ if __name__ == '__main__':
 		generate_user_id_list_freqs_output(parsed.posts_file)
 
 	if parsed.generate_usernames_json:
-		generate_user_id_list_freqs_json(parsed.posts_file, parsed.output_file)
+		generate_user_id_list_freqs_json(parsed.posts_file, parsed.output_json_file)
 
 	if parsed.generate_usernames:
 		generate_user_list_freqs_output(parsed.posts_file)

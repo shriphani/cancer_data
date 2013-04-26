@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+'''
+This is the base reader class that talks to posts.txt
+'''
+
 import argparse
 import cleaner
 
